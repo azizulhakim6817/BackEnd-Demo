@@ -25,7 +25,6 @@ import {
 import router from "./app/Routes/api.js";
 
 const app = express();
-app.use(cors());
 app.use(express.urlencoded({ extended: URL_ENCODE }));
 app.use(express.json());
 app.use(cookieParser());
@@ -33,6 +32,13 @@ app.use(expressMongoSanitize());
 app.use(helmet());
 app.use(hpp());
 app.use(xss());
+
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:8000",
+  })
+);
 
 // !Database connection..................
 mongoose

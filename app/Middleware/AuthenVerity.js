@@ -1,17 +1,23 @@
-import { DecodeToken } from "../utility/tokenUtility";
+import { DecodeToken } from "../utility/tokenUtility.js";
 
 export default (req, res, next) => {
-  let token = req.headers.token || req.cookies.token; // Get token from headers or cookies
+  let token = req.cookies["Token"];
+  let decoded = DecodeToken(token);
 
-  const decoded = DecodeToken(token); // Decode the token
+  if (decoded === null) {
+    res.status(401).json({ status: "fail", message: "Unauthorized" });
+  } else {
+    // Set cookie for refresh token
+    let options = {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      httpOnly: true,
+      sameSite: "none",
+      secure: true,
+    };
+    res.cookie("Token", decoded.RefreshToken, options);
+    let email = decoded.email;
 
-  if (!decoded) {
-    return res.status(401).json({ status: "fail", message: "Unauthorized" });
+    req.headers.email = email;
+    next();
   }
-
-  const { email, user_id } = decoded;
-  req.headers.email = email;
-  req.headers.user_id = user_id;
-
-  next();
 };

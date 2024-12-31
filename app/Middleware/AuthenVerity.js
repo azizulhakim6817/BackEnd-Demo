@@ -16,8 +16,10 @@ export default (req, res, next) => {
     };
     res.cookie("Token", decoded.RefreshToken, options);
     let email = decoded.email;
+    let user_id = decoded.user_id;
 
     req.headers.email = email;
+    req.headers.user_id = user_id;
     next();
   }
 };
